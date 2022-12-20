@@ -327,16 +327,6 @@ if __name__ == "__main__":
         action = 'store_true',
         help = 'Run without writing files')
 
-    apply = subparsers.add_parser('sync',help = 'Sync configuration')
-    apply.add_argument(
-        dest = 'name',
-        type = str,
-        help = 'Configuration name like "wg0"')
-    apply.add_argument(
-        dest = 'conf',
-        type = _config_file_type,
-        help = 'Configuration file like "/etc/wireguard/wg0.conf"')
-
     subparsers.add_parser('server',help = 'Generate a new server CSV line')
     subparsers.add_parser('client',help = 'Generate a new client CSV line')
 
@@ -357,9 +347,6 @@ if __name__ == "__main__":
                 wgcs.client_output(args.outdir)
         except ValueExc as vexc:
             logger.exception(str(vexc))
-
-    elif args.command == 'sync':
-        run(['wg','syncconf',args.name,args.conf],check = True)
 
     elif args.command == 'server':
         print(f'wg-name,{gen_ula()}/48,<domain:443>,51820,{gen_privatekey()}')
