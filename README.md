@@ -28,7 +28,7 @@
 ```
 ./wgclientserver.py client >> myclients.csv
 ```
-4. Edit myserver.csv. The column are the configuration name, IPv6 network (this is randomized, but can be manually chosen), Endpoint with external port, internal port, private key. The configuration names for both server and client must adhere to rules: can use alpha-numerics; can use "_=+.-"; and less than or equal to 15 characters.
+4. Edit myserver.csv. The column are the configuration name, IPv6 network (this is randomized, but can be manually chosen), Endpoint with external port, internal port, private key. The configuration names for both server and client must adhere to rules: can use alpha-numerics; can use "_=+.-"; and less than or equal to 15 characters. The IPv6 networks must be Unique Local Addresses (ULA), which start with "fd". It is also best to keep the /48 and /64 used in the next section.
 ```
 wg-name,fd4e:d574:39d0::/48,<domain:443>,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
 ```
