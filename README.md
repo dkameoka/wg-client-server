@@ -1,20 +1,21 @@
 # Wireguard IPv6 Client Server Configurator Python Script
 
-* Used to setup a partially routed tunnel between server and clients
-* Uses IPv6 for configurations. This reduces network collisions when using multiple VPNs
-* Great for home servers where family and friends can connect to
+* Used to setup a partially routed tunnel between server and clients.
+* Uses IPv6 for configurations. This reduces network collisions when using multiple VPNs.
+* Great for home servers where family and friends can connect to.
 * The server manager manages and creates all configurations to be shared; optionally with QR code images.
+* Low dependencies: Only depends on the base Python 3 install, Wireguard (comes with newer Linux), and qrencode.
 
 ## Restrictions
 * Most cellular service providers and firewalls filter out various ports and traffic (UDP) that Wireguard uses. To get around this, use commonly used ports like 443, 989, and 80 for the server (port forwarding router or OS level prerouting redirects) and Endpoints. When port fowarding on the server's router, you can forward all of those ports to 51820 towards the server. If that doesn't work to bypass, you may need to tunnel the Wireguard traffic and it may not be worth the hastle.
 * Without support for NAT hairpinning, a router won't forward packets with the external destination IP back to the internal network. To get around this, each client device would need a duplicate configuration with one Endpoint set to the internal host and the other for the external host. The client would need to toggle between those configurations as the device transitioned between the internal and external networks like between the home router and coffee shop router.
-* An external DNS has to be used for internal IPs for privacy reasons. Using the DNS setting in Wireguard could route all client DNS requests through the server. Duckdns.org is a great solution for this by using it for internal IPs
+* An external DNS has to be used for internal IPs for privacy reasons. Using the DNS setting in Wireguard could route all client DNS requests through the server. Duckdns.org is a great solution for this by using it for internal IPs.
 
 ## Requires
 * All devices support IPv6. IPv6 internet is not required.
-* Python 3
-* wg command
-* (Optional) qrencode command for QR encoded configurations
+* Python 3.
+* wg command.
+* (Optional) qrencode command for QR encoded configurations.
 
 ## Setup
 ### Generating Configurations
@@ -35,7 +36,7 @@ Example
 ```
 homeserver,fd4e:d574:39d0::/48,homeserver.duckdns.org:989,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
 ```
-5. Edit myclients.csv. The columns are the configuration name, IPv6 address within the homeserver network (you can separate into different subnets for firewalling), persistent keep-alive sent per x seconds (keeps connections from being lost from firewalls/NATs), private key, preshared key (more encryption security)
+5. Edit myclients.csv. The columns are the configuration name, IPv6 address within the homeserver network (you can separate into different subnets for firewalling), persistent keep-alive sent per x seconds (keeps connections from being lost from firewalls/NATs), private key, preshared key (more encryption security).
 ```
 client-name,fd::/64,25,AKmMeRA72jiwWPGsDXfDTNISc79KDcdkVHLBlGJDxmc=,H6eTpAPpnkKMXw9yVf6EOYfIi47VbrbrFb2aqu7vtas=
 client-name,fd::/64,25,2FCeazhMiZL1GO+IHMVzDgVvsv/rJFZcq0XDZwtAnk8=,GHM1EtQMCYvFzkSPdlnGRz8IvpkUS0fyYkkvqEbwcJI=
@@ -55,8 +56,8 @@ friend-laptop,fd43:d574:39d0:1::1/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MM
 ```
 systemctl enable --now wg-quick@homeserver
 ```
-8. Allow Wireguard and the server services through the server's firewall. See my [nftables configuration scripts](https://github.com/dkameoka/nftables-template)
-9. Port forward the server's router to forward ports 443, 989, and 80 with UDP traffic towards the server's internal ip with 51820. Below is a diagram
+8. Allow Wireguard and the server services through the server's firewall. See my [nftables configuration scripts](https://github.com/dkameoka/nftables-template).
+9. Port forward the server's router to forward ports 443, 989, and 80 with UDP traffic towards the server's internal ip with 51820. Below is a diagram.
 ```
 UDP { external:443 -> server-internal-ip:51820 }
 UDP { external:989 -> server-internal-ip:51820 }
