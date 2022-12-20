@@ -56,6 +56,10 @@ friend-laptop,fd43:d574:39d0:1::1/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MM
 ```
 systemctl enable --now wg-quick@homeserver
 ```
+If updating the server, run the following.
+```
+wg syncconf homeserver /etc/wireguard/homeserver.conf
+```
 8. Allow Wireguard and the server services through the server's firewall. See my [nftables configuration scripts](https://github.com/dkameoka/nftables-template).
 9. Port forward the server's router to forward ports 443, 989, and 80 with UDP traffic towards the server's internal ip with 51820. Below is a diagram.
 ```
