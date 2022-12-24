@@ -62,13 +62,13 @@ class WireguardClientServer:
             fieldnames = ('name','prefix','endpoint','listenport','privatekey','table',
                 'preup','postup','predown','postdown')
             reader = csv.DictReader(file,fieldnames = fieldnames,delimiter = ',',quotechar = '"')
-            for line,row in enumerate(reader):
+            for line,row in enumerate(reader,1):
                 try:
                     self.server_row(row)
                 except ValueExc as valexc:
-                    raise ValueExc(f'{path} on line {line + 1}: {str(valexc)}') from valexc
+                    raise ValueExc(f'{path} on line {line}: {str(valexc)}') from valexc
                 except Exception as exc:
-                    raise Exception(f'Failed to parse CSV {path} on line {line + 1}') from exc
+                    raise Exception(f'Failed to parse CSV {path} on line {line}') from exc
 
     def server_row(self,row):
         self.validate_name(row['name'])
@@ -167,13 +167,13 @@ class WireguardClientServer:
         with path.open('r',newline = '') as file:
             fieldnames = ('name','allowedip','persistentkeepalive','privatekey','presharedkey')
             reader = csv.DictReader(file,fieldnames = fieldnames,delimiter = ',',quotechar = '"')
-            for line,row in enumerate(reader):
+            for line,row in enumerate(reader,1):
                 try:
                     self.client_row(row)
                 except ValueExc as valexc:
-                    raise ValueExc(f'{path} on line {line + 1}: {str(valexc)}') from valexc
+                    raise ValueExc(f'{path} on line {line}: {str(valexc)}') from valexc
                 except Exception as exc:
-                    raise Exception(f'Failed to parse CSV {path} on line: {line + 1}') from exc
+                    raise Exception(f'Failed to parse CSV {path} on line: {line}') from exc
 
     def client_row(self,row):
         self.validate_name(row['name'])
