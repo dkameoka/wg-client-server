@@ -318,11 +318,11 @@ if __name__ == "__main__":
         type = _output_folder_type,
         help = 'Output folder')
     build.add_argument(
-        dest = 'server_conf',
+        dest = 'server_csv',
         type = _config_file_type,
         help = 'Path to server CSV configuration file')
     build.add_argument(
-        dest = 'client_conf',
+        dest = 'client_csv',
         type = _config_file_type,
         help = 'Path to client CSV configuration file')
     build.add_argument(
@@ -345,7 +345,7 @@ if __name__ == "__main__":
 
     if args.command == 'build':
         try:
-            wgcs = WireguardClientServer(args.server_conf,args.client_conf)
+            wgcs = WireguardClientServer(args.server_csv,args.client_csv)
             if not args.dry_run:
                 wgcs.server_output(args.outdir)
                 wgcs.client_output(args.outdir)
