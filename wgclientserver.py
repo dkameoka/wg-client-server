@@ -66,9 +66,9 @@ class WireguardClientServer:
                 try:
                     self.server_row(row)
                 except ValueExc as valexc:
-                    raise ValueExc(f'{path} on line {line}: {str(valexc)}') from valexc
+                    raise ValueExc(f'{path} on line {line + 1}: {str(valexc)}') from valexc
                 except Exception as exc:
-                    raise Exception(f'Failed to parse CSV {path} on line {line}') from exc
+                    raise Exception(f'Failed to parse CSV {path} on line {line + 1}') from exc
 
     def server_row(self,row):
         self.validate_name(row['name'])
@@ -171,9 +171,9 @@ class WireguardClientServer:
                 try:
                     self.client_row(row)
                 except ValueExc as valexc:
-                    raise ValueExc(f'{path} on line {line}: {str(valexc)}') from valexc
+                    raise ValueExc(f'{path} on line {line + 1}: {str(valexc)}') from valexc
                 except Exception as exc:
-                    raise Exception(f'Failed to parse CSV {path} on line: {line}') from exc
+                    raise Exception(f'Failed to parse CSV {path} on line: {line + 1}') from exc
 
     def client_row(self,row):
         self.validate_name(row['name'])
@@ -184,7 +184,10 @@ class WireguardClientServer:
         self.clients += [_Client(**row)]
 
     def validate_allowedip(self,row,allowedip):
-        iface = ipaddress.IPv6Interface(allowedip)
+        try:
+            iface = ipaddress.IPv6Interface(allowedip)
+        except ipaddress.AddressValueError as exc:
+            raise ValueExc(f'AllowedIP {allowedip} is not valid: {exc}')
         if iface.network.prefixlen != 64:
             raise ValueExc(f'AllowedIP {allowedip} with prefix length should be 64')
         if not iface.ip.is_private:
