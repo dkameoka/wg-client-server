@@ -198,11 +198,12 @@ class WireguardClientServer:
         for server in self.servers:
             if server.ipa == iface.ip:
                 raise ValueExc(f'AllowedIP {allowedip} is a duplicate of {server.name}\'s')
-        found = False
         for server in self.servers:
             if iface.ip in server.net:
-                found = True
-        if not found:
+                break
+            else:
+                print(f'{iface.ip} not in {server.net}')
+        else:
             raise ValueExc(f'AllowedIP {allowedip} has no matching server network')
         row['ipa'] = iface.ip
         row['net'] = iface.network
