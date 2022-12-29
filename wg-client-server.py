@@ -51,7 +51,8 @@ class ValueExc(Exception):
 
 class WireguardClientServer:
     """ Generates client server configurations """
-    def __init__(self,server_path,client_path):
+    def __init__(self,wireguard_path,server_path,client_path):
+        self.wireguard_path = wireguard_path
         self.servers = []
         self.clients = []
         self.server_csv(server_path)
@@ -146,7 +147,7 @@ class WireguardClientServer:
 
     def validate_privatekey(self,row,privatekey):
         self.validate_key(privatekey)
-        with Popen(['wg','pubkey'],stdout = PIPE,stdin = PIPE) as proc:
+        with Popen([self.wireguard_path,'pubkey'],stdout = PIPE,stdin = PIPE) as proc:
             public,_ = proc.communicate(privatekey.encode())
             if proc.returncode != 0:
                 raise ValueExc(f'Could not generate public key for {row["name"]}:{privatekey}')
@@ -187,7 +188,7 @@ class WireguardClientServer:
         try:
             iface = ipaddress.IPv6Interface(allowedip)
         except ipaddress.AddressValueError as exc:
-            raise ValueExc(f'AllowedIP {allowedip} is not valid: {exc}')
+            raise ValueExc(f'AllowedIP {allowedip} is not valid: {exc}') from exc
         if iface.network.prefixlen != 64:
             raise ValueExc(f'AllowedIP {allowedip} with prefix length should be 64')
         if not iface.ip.is_private:
@@ -201,8 +202,7 @@ class WireguardClientServer:
         for server in self.servers:
             if iface.ip in server.net:
                 break
-            else:
-                print(f'{iface.ip} not in {server.net}')
+            print(f'{iface.ip} not in {server.net}')
         else:
             raise ValueExc(f'AllowedIP {allowedip} has no matching server network')
         row['ipa'] = iface.ip
@@ -268,15 +268,15 @@ class WireguardClientServer:
                     run(['qrencode','-r',outpath,'-o',str(outpath) + '.png'],check = True)
                 break
 
-def gen_privatekey():
-    with Popen(['wg','genkey'],stdout = PIPE) as proc:
+def gen_privatekey(wireguard_path):
+    with Popen([wireguard_path,'genkey'],stdout = PIPE) as proc:
         private,_ = proc.communicate()
         if proc.returncode != 0:
             raise ValueExc('Could not generate private key')
     return private.decode().strip()
 
-def gen_presharedkey():
-    with Popen(['wg','genpsk'],stdout = PIPE) as proc:
+def gen_presharedkey(wireguard_path):
+    with Popen([wireguard_path,'genpsk'],stdout = PIPE) as proc:
         preshared,_ = proc.communicate()
         if proc.returncode != 0:
             raise ValueExc('Could not generate preshared key')
@@ -293,14 +293,20 @@ def _output_folder_type(value):
         raise ValueError(f'Path {folder} is not a folder')
     return folder
 
-def _config_file_type(value):
+def _file_type(value):
     config = Path(value)
     if not config.exists() or not config.is_file():
         raise ValueError('Configuration file must exist and must be a regular file.\n')
     return config
 
-if __name__ == "__main__":
+def _main():
     parser = argparse.ArgumentParser(description='Wireguard IPv6 Client Server Configurator')
+    parser.add_argument(
+        '-w','--wireguard',
+        dest = 'wireguard_path',
+        type = _file_type,
+        default = shutil.which('wg'),
+        help = 'Path to Wireguard executable')
     parser.add_argument(
         '-l','--loglevel',
         dest = 'loglevel',
@@ -319,11 +325,11 @@ if __name__ == "__main__":
         help = 'Output folder')
     build.add_argument(
         dest = 'server_csv',
-        type = _config_file_type,
+        type = _file_type,
         help = 'Path to server CSV configuration file')
     build.add_argument(
         dest = 'client_csv',
-        type = _config_file_type,
+        type = _file_type,
         help = 'Path to client CSV configuration file')
     build.add_argument(
         '-d','--dry-run',
@@ -340,8 +346,10 @@ if __name__ == "__main__":
         level = args.loglevel,
         format = '%(asctime)s %(message)s')
 
-    #Check for wg
-    assert shutil.which('wg')
+    if args.wireguard_path is None:
+        logger.error('Cannot find the "wg" executable.'
+            'Install it or provide a path with -w/--wireguard (placed before the command).')
+        return
 
     if args.command == 'build':
         try:
@@ -353,9 +361,13 @@ if __name__ == "__main__":
             logger.exception(str(vexc))
 
     elif args.command == 'server':
-        print(f'wg-name,{gen_ula()}/48,<domain:443>,51820,{gen_privatekey()}')
+        print(f'wg-name,{gen_ula()}/48,<domain:443>,51820,{gen_privatekey(args.wireguard_path)}')
 
     elif args.command == 'client':
-        print(f'client-name,fd::/64,25,{gen_privatekey()},{gen_presharedkey()}')
+        print(f'client-name,fd::/64,25,{gen_privatekey(args.wireguard_path)},'
+            f'{gen_presharedkey(args.wireguard_path)}')
 
     logger.info('Done')
+
+if __name__ == '__main__':
+    _main()
