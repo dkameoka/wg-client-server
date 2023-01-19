@@ -136,11 +136,11 @@ class WireguardClientServer:
             raise ValueExc(f'Port is not an integer: {port}') from valerr
         if port < 1 or port > 65535:
             raise ValueExc(f'Port {port} must be between 1 and 65535 inclusive')
-        if info and port != 443:
-            logger.warning('Note that most cellular service providers block lots of traffic.' +
-                ' The workaround is to use ports 443, 989, 80, or others with port forwarding.' +
+        if info and port not in [443,989,80]:
+            logger.warning('Note that many internet service providers block lots of traffic.' +
+                ' A workaround is to use ports like 443, 989, 80, and others.' +
                 ' Otherwise, tunnel traffic with tools like: shadowsocks, trojan, v2ray, cloak,' +
-                ' simple-tls, tlstun, udp2raw')
+                ' simple-tls, tlstun, and udp2raw')
 
     def validate_listenport(self,listenport):
         self.validate_port(listenport)
@@ -244,6 +244,7 @@ class WireguardClientServer:
                 output += f'AllowedIPs = {client.ipa}/{client.net.max_prefixlen}\n'
             with (outdir / (server.name + '.conf')).open('w') as file:
                 file.write(output)
+
     def client_output(self,outdir):
         for client in self.clients:
             for server in self.servers:
