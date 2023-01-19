@@ -354,7 +354,7 @@ def _main():
 
     if args.command == 'build':
         try:
-            wgcs = WireguardClientServer(args.server_csv,args.client_csv)
+            wgcs = WireguardClientServer(args.wireguard_path,args.server_csv,args.client_csv)
             if not args.dry_run:
                 wgcs.server_output(args.outdir)
                 wgcs.client_output(args.outdir)
