@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-# pylint: disable=broad-except,logging-fstring-interpolation,missing-function-docstring
-# pylint: disable=missing-module-docstring,logging-not-lazy,too-many-instance-attributes
+# pylint: disable=broad-except,missing-function-docstring
+# pylint: disable=missing-module-docstring,too-many-instance-attributes
 
-import logging
 import argparse
 import secrets
 import csv
@@ -14,8 +13,6 @@ import binascii
 from subprocess import Popen, run, PIPE
 from pathlib import Path
 from dataclasses import dataclass
-
-logger = logging.getLogger()
 
 
 @dataclass
@@ -69,15 +66,11 @@ class WireguardClientServer:
                           'preup', 'postup', 'predown', 'postdown')
             reader = csv.DictReader(
                 file, fieldnames=fieldnames, delimiter=',', quotechar='"', restval='')
-            for line, row in enumerate(reader, 1):
+            for row in reader:
                 try:
                     self.server_row(row)
                 except ValueExc as valexc:
-                    raise ValueExc(
-                        f'{path} on line {line}: {str(valexc)}') from valexc
-                except Exception as exc:
-                    raise Exception(
-                        f'Failed to parse CSV {path} on line {line}') from exc
+                    print(f'{path} error: {valexc}')
 
     def server_row(self, row):
         self.validate_name(row['name'])
@@ -91,45 +84,40 @@ class WireguardClientServer:
     def validate_name(self, name):
         for char in name:
             if not char.isalnum() and char not in ['_', '=', '+', '.', '-']:
-                raise ValueExc(
-                    f'{name} has characters besides alpha-numerics and "_=+.-"')
+                raise ValueExc(f'Name "{name}" has characters besides alpha-numerics and "_=+.-"')
         length = len(name)
         if length == 0 or length > 15:
-            raise ValueExc(f'Name {name} is invalid or too long')
+            raise ValueExc(f'Name "{name}" is invalid or too long')
         for server in self.servers:
             if server.name == name:
-                raise ValueExc(
-                    f'Name {name} is a duplicate of a server\'s name')
+                raise ValueExc(f'Name "{name}" is a duplicate of a server\'s name')
         for client in self.clients:
             if client.name == name:
-                raise ValueExc(
-                    f'Name {name} is a duplicate of a client\'s name')
+                raise ValueExc(f'Name "{name}" is a duplicate of a client\'s name')
 
     def validate_key(self, key):
         try:
             decoded = base64.b64decode(key, validate=True)
             if len(decoded) != 32:
-                raise ValueExc(f'Key {key} is not 32 bytes of base64')
+                raise ValueExc(f'Key "{key}" is not 32 bytes of base64')
         except binascii.Error as berr:
-            raise ValueExc(f'Key {key} is not valid base64') from berr
+            raise ValueExc(f'Key "{key}" is not valid base64') from berr
         for server in self.servers:
             if key in [server.privatekey, server.publickey]:
-                raise ValueExc(
-                    f'Key {key} is a duplicate of {server.name}\'s key')
+                raise ValueExc(f'Key "{key}" is a duplicate of {server.name}\'s key')
         for client in self.clients:
             if key in [client.privatekey, client.publickey, client.presharedkey]:
-                raise ValueExc(
-                    f'Key {key} is a duplicate of {client.name}\'s key')
+                raise ValueExc(f'Key "{key}" is a duplicate of {client.name}\'s key')
 
     def validate_prefix(self, row, prefix):
         iface = ipaddress.IPv6Interface(prefix)
         if iface.network.prefixlen != 48:
-            raise ValueExc(f'Prefix {prefix} prefix length should be 48')
+            raise ValueExc(f'Prefix "{prefix}" prefix length should be 48')
         if not iface.ip.is_private:
-            raise ValueExc(f'Prefix {prefix} is not a unique local address')
+            raise ValueExc(f'Prefix "{prefix}" is not a unique local address')
         for server in self.servers:
             if iface.network.overlaps(server.net):
-                raise ValueExc(f'Prefix {prefix} with {str(iface.network)} overlaps with '
+                raise ValueExc(f'Prefix "{prefix}" with {str(iface.network)} overlaps with '
                                f'another server network {str(server.net)}')
         row['ipa'] = iface.ip
         row['net'] = iface.network
@@ -137,25 +125,18 @@ class WireguardClientServer:
     def validate_endpoint(self, endpoint):
         endpoint_split = endpoint.split(':')
         if len(endpoint_split) != 2:
-            raise ValueExc(f'Endpoint is invalid or is missing the port: {endpoint}. '
+            raise ValueExc(f'Endpoint "{endpoint}" is invalid or is missing the port. '
                            f'Example: hostname_or_ip:443')
-        self.validate_port(endpoint_split[1], info=True)
+        self.validate_port(endpoint_split[1])
 
     @staticmethod
-    def validate_port(port, info=False):
+    def validate_port(port):
         try:
             port = int(port)
         except ValueError as valerr:
-            raise ValueExc(f'Port is not an integer: {port}') from valerr
+            raise ValueExc(f'Port "{port}" is not an integer') from valerr
         if port < 1 or port > 65535:
-            raise ValueExc(
-                f'Port {port} must be between 1 and 65535 inclusive')
-        if info and port not in [443, 989, 80]:
-            logger.warning(
-                'Note that many internet service providers block lots of traffic.' +
-                ' A workaround is to use ports like 443, 989, 80, and others.' +
-                ' Otherwise, tunnel traffic with tools like: shadowsocks, trojan, v2ray, cloak,' +
-                ' simple-tls, tlstun, and udp2raw')
+            raise ValueExc(f'Port "{port}" must be between 1 and 65535 inclusive')
 
     def validate_listenport(self, listenport):
         self.validate_port(listenport)
@@ -165,8 +146,7 @@ class WireguardClientServer:
         with Popen([self.wireguard_path, 'pubkey'], stdout=PIPE, stdin=PIPE) as proc:
             public, _ = proc.communicate(privatekey.encode())
             if proc.returncode != 0:
-                raise ValueExc(
-                    f'Could not generate public key for {row["name"]}:{privatekey}')
+                raise ValueExc(f'Could not generate public key for {row["name"]}:{privatekey}')
         row['publickey'] = public.decode().strip()
 
     @staticmethod
@@ -178,8 +158,7 @@ class WireguardClientServer:
         except ValueError as valerr:
             if table.lower() in ['off', 'auto']:
                 pass
-            raise ValueExc(
-                f'Table value {table} is not "off", "auto", or an integer') from valerr
+            raise ValueExc(f'Table {table} is not "off", "auto", or an integer') from valerr
 
     def client_csv(self, path):
         with path.open('r', newline='') as file:
@@ -187,15 +166,11 @@ class WireguardClientServer:
                           'privatekey', 'presharedkey')
             reader = csv.DictReader(
                 file, fieldnames=fieldnames, delimiter=',', quotechar='"', restval='')
-            for line, row in enumerate(reader, 1):
+            for row in reader:
                 try:
                     self.client_row(row)
                 except ValueExc as valexc:
-                    raise ValueExc(
-                        f'{path} on line {line}: {str(valexc)}') from valexc
-                except Exception as exc:
-                    raise Exception(
-                        f'Failed to parse CSV {path} on line: {line}') from exc
+                    print(f'{path} error: {valexc}')
 
     def client_row(self, row):
         self.validate_name(row['name'])
@@ -209,29 +184,22 @@ class WireguardClientServer:
         try:
             iface = ipaddress.IPv6Interface(allowedip)
         except ipaddress.AddressValueError as exc:
-            raise ValueExc(
-                f'AllowedIP {allowedip} is not valid: {exc}') from exc
+            raise ValueExc(f'AllowedIP "{allowedip}" is not valid: {exc}') from exc
         if iface.network.prefixlen != 64:
-            raise ValueExc(
-                f'AllowedIP {allowedip} with prefix length should be 64')
+            raise ValueExc(f'AllowedIP "{allowedip}" with prefix length should be 64')
         if not iface.ip.is_private:
-            raise ValueExc(
-                f'AllowedIP {allowedip} is not a unique local address')
+            raise ValueExc(f'AllowedIP "{allowedip}" is not a unique local address')
         for client in self.clients:
             if client.ipa == iface.ip:
-                raise ValueExc(
-                    f'AllowedIP {allowedip} is a duplicate of {client.name}\'s')
+                raise ValueExc(f'AllowedIP "{allowedip}" is a duplicate of {client.name}\'s')
         for server in self.servers:
             if server.ipa == iface.ip:
-                raise ValueExc(
-                    f'AllowedIP {allowedip} is a duplicate of {server.name}\'s')
+                raise ValueExc(f'AllowedIP "{allowedip}" is a duplicate of {server.name}\'s')
         for server in self.servers:
             if iface.ip in server.net:
                 break
-            print(f'{iface.ip} not in {server.net}')
         else:
-            raise ValueExc(
-                f'AllowedIP {allowedip} has no matching server network')
+            raise ValueExc(f'AllowedIP "{allowedip}" has no matching server network')
         row['ipa'] = iface.ip
         row['net'] = iface.network
 
@@ -240,10 +208,9 @@ class WireguardClientServer:
         try:
             keepalive_ = int(keepalive)
         except ValueError as valerr:
-            raise ValueExc(
-                f'Persistentkeepalive {keepalive} is not an integer') from valerr
+            raise ValueExc(f'Persistentkeepalive "{keepalive}" is not an integer') from valerr
         if keepalive_ < 1 or keepalive_ > 7200:
-            raise ValueExc(f'Persistentkeepalive {keepalive} must be ' +
+            raise ValueExc(f'Persistentkeepalive "{keepalive}" must be ' +
                            'between 1 and 7200 inclusive')
 
     def server_output(self, outdir):
@@ -294,8 +261,7 @@ class WireguardClientServer:
                 with outpath.open('w') as file:
                     file.write(output)
                 if shutil.which('qrencode'):
-                    run(['qrencode', '-r', outpath, '-o',
-                        str(outpath) + '.png'], check=True)
+                    run(['qrencode', '-r', outpath, '-o', str(outpath) + '.png'], check=True)
                 break
 
 
@@ -324,7 +290,7 @@ def gen_ula():
 def _output_folder_type(value):
     folder = Path(value)
     if not folder.is_dir():
-        raise ValueError(f'Path {folder} is not a folder')
+        raise ValueError(f'Path "{folder}" is not a folder')
     return folder
 
 
@@ -345,13 +311,6 @@ def _main():
         type=_file_type,
         default=shutil.which('wg'),
         help='Path to Wireguard executable')
-    parser.add_argument(
-        '-l', '--loglevel',
-        dest='loglevel',
-        type=str,
-        default='WARNING',
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help='Logging report threshold: DEBUG, INFO, WARNING, ERROR, or CRITICAL')
 
     subparsers = parser.add_subparsers(required=True)
     subparsers.dest = 'command'
@@ -380,25 +339,18 @@ def _main():
 
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=args.loglevel,
-        format='%(asctime)s %(message)s')
-
     if args.wireguard_path is None:
-        logger.error(
+        print(
             'Cannot find the "wg" executable.'
             'Install it or provide a path with -w/--wireguard (placed before the command).')
         return
 
     if args.command == 'build':
-        try:
-            wgcs = WireguardClientServer(
-                args.wireguard_path, args.server_csv, args.client_csv)
-            if not args.dry_run:
-                wgcs.server_output(args.outdir)
-                wgcs.client_output(args.outdir)
-        except ValueExc as vexc:
-            logger.exception(str(vexc))
+        wgcs = WireguardClientServer(
+            args.wireguard_path, args.server_csv, args.client_csv)
+        if not args.dry_run:
+            wgcs.server_output(args.outdir)
+            wgcs.client_output(args.outdir)
 
     elif args.command == 'server':
         print(
@@ -407,8 +359,6 @@ def _main():
     elif args.command == 'client':
         print(f'client-name,fd::/64,25,{gen_privatekey(args.wireguard_path)},'
               f'{gen_presharedkey(args.wireguard_path)}')
-
-    logger.info('Done')
 
 
 if __name__ == '__main__':
