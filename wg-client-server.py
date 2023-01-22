@@ -68,7 +68,7 @@ class WireguardClientServer:
             fieldnames = ('name', 'prefix', 'endpoint', 'listenport', 'privatekey', 'table',
                           'preup', 'postup', 'predown', 'postdown')
             reader = csv.DictReader(
-                file, fieldnames=fieldnames, delimiter=',', quotechar='"')
+                file, fieldnames=fieldnames, delimiter=',', quotechar='"', restval='')
             for line, row in enumerate(reader, 1):
                 try:
                     self.server_row(row)
@@ -186,7 +186,7 @@ class WireguardClientServer:
             fieldnames = ('name', 'allowedip', 'persistentkeepalive',
                           'privatekey', 'presharedkey')
             reader = csv.DictReader(
-                file, fieldnames=fieldnames, delimiter=',', quotechar='"')
+                file, fieldnames=fieldnames, delimiter=',', quotechar='"', restval='')
             for line, row in enumerate(reader, 1):
                 try:
                     self.client_row(row)
