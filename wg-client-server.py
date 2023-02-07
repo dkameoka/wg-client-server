@@ -245,7 +245,9 @@ class WireguardClientServer:
                 output += f'PublicKey = {client.publickey}\n'
                 output += f'PresharedKey = {client.presharedkey}\n'
                 output += f'AllowedIPs = {client.ipa}/{client.net.max_prefixlen}\n'
-            self._write_if_different(outdir / (server.name + '.conf'), output)
+            outpath = outdir / (server.name + '.conf')
+            self._write_if_different(outpath, output)
+            outpath.chmod(0o600)  # Try to use secure permissions.
 
     def client_output(self, outdir):
         for client in self.clients:
@@ -269,6 +271,7 @@ class WireguardClientServer:
                     if self.qrencode_path:
                         run([self.qrencode_path, '-r', outpath, '-o', str(outpath) + '.png'],
                             check=True)
+                outpath.chmod(0o600)  # Try to use secure permissions.
                 break
 
 
