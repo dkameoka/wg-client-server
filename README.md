@@ -1,10 +1,9 @@
 # Wireguard IPv6 Client Server Configurator Python Script
 
 * Used to setup a partially routed tunnel between server and clients.
-* Uses IPv6 for configurations. This reduces network collisions when using multiple VPNs.
+* Uses IPv6 for configurations. This reduces network collisions when using multiple VPNs. Tunnel endpoint can be through IPv4, so IPv6 connection is not necessary.
 * Great for home servers where family and friends can connect to.
-* The server manager manages and creates all configurations to be shared; optionally with QR code images.
-* Low dependencies: Only depends on the base Python 3 install, Wireguard (comes with newer Linux), and qrencode.
+* Low dependencies: Only depends on the base Python 3 install, Wireguard (comes with newer Linux), and optional qrencode.
 
 ## Restrictions
 * Most cellular service providers and firewalls filter out various ports and traffic (UDP) that Wireguard uses. To get around this, use commonly used ports like 443, 989, and 80 for the server (port forwarding router or OS level prerouting redirects) and Endpoints. When port fowarding on the server's router, you can forward all of those ports to 51820 towards the server. If that doesn't work to bypass, you may need to tunnel the Wireguard traffic and it may not be worth the hastle.
@@ -69,5 +68,5 @@ UDP { external:443 -> server-internal-ip:51820 }
 UDP { external:989 -> server-internal-ip:51820 }
 UDP { external:80 -> server-internal-ip:51820 }
 ```
-10. Give the various configurations and QR code images to each designated client.
+10. Securely distribute each user's configuration and QR code image.
 
