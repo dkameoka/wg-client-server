@@ -249,6 +249,16 @@ class WireguardClientServer:
             self._write_if_different(outpath, output)
             outpath.chmod(0o600)  # Try to use secure permissions.
 
+    def _qrencode(self, filepath, outpng):
+        if not self.qrencode_path:
+            return
+        try:
+            run([self.qrencode_path, '-r', filepath, '-o', outpng], check=True)
+            outpng.chmod(0o600)
+        except Exception as exc:
+            print(f'Qrencode error: {exc}')
+            self.qrencode_path = None
+
     def client_output(self, outdir):
         for client in self.clients:
             for server in self.servers:
@@ -267,10 +277,9 @@ class WireguardClientServer:
                 output += f'PresharedKey = {client.presharedkey}\n'
                 output += f'PersistentKeepalive = {client.persistentkeepalive}\n'
                 outpath = outdir / (client.name + '.conf')
-                if self._write_if_different(outpath, output):
-                    if self.qrencode_path:
-                        run([self.qrencode_path, '-r', outpath, '-o', str(outpath) + '.png'],
-                            check=True)
+                outpng = outpath.with_suffix('.png')
+                if self._write_if_different(outpath, output) or not outpng.exists():
+                    self._qrencode(outpath, outpng)
                 outpath.chmod(0o600)  # Try to use secure permissions.
                 break
 
