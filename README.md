@@ -19,11 +19,11 @@
 ## Setup
 ### Generating Configurations
 1. Change current working directory (CWD) into the one containing the wgclientserver.py script.
-2. Run the following command to generate a single server CSV line. It redirects and overwrites myserver.csv:
+2. Run the following command to generate a single server CSV line. It redirects and overwrites myserver.csv.
 ```
 ./wgclientserver.py server > myserver.csv
 ```
-3. Run the following command a bunch of times to generate multiple client CSV lines. It redirects and appends to myclients.csv:
+3. Run the following command a bunch of times to generate multiple client CSV lines. It redirects and appends to myclients.csv.
 ```
 ./wgclientserver.py client >> myclients.csv
 ```
@@ -53,20 +53,24 @@ friend-laptop,fd4e:d574:39d0:2::1/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MM
 ```
 ./wgclientserver.py build . myserver.csv myclients.csv
 ```
-7. Put the generated homeserver.conf on the server in /etc/wireguard/ or equivalent configuration path. Enable and activate the wireguard server. The command for Linux is below.
+7. Put the generated homeserver.conf on the server in /etc/wireguard/ or equivalent configuration path. Linux command below.
 ```
-systemctl enable --now wg-quick@homeserver
+sudo mv homeserver.conf /etc/wireguard/
 ```
-If updating the server's configuration, run the following to update Wireguard's state without interruption.
+8. Enable and activate the wireguard server. Linux Systemd command below.
 ```
-wg syncconf homeserver /etc/wireguard/homeserver.conf
+sudo systemctl enable --now wg-quick@homeserver
 ```
-8. Allow Wireguard and the server services through the server's firewall. See my [nftables configuration scripts](https://github.com/dkameoka/nftables-template).
-9. Port forward the server's router to forward ports 443, 989, and 80 with UDP traffic towards the server's internal IP with 51820. Below is a diagram.
+If updating the server's configuration, modify and run the following to update Wireguard's state without interruption. The wg-quick command is used to remove wg-quick options while in a sub-shell and piping it to the wg command.
+```
+sudo wg syncconf homeserver <(wg-quick strip /etc/wireguard/homeserver.conf)
+```
+9. Allow Wireguard and the server services through the server's firewall. See my [nftables configuration scripts](https://github.com/dkameoka/nftables-template).
+10. Port forward the server's router to forward ports 443, 989, and 80 with UDP traffic towards the server's internal IP with 51820. Below is a diagram.
 ```
 UDP { external:443 -> server-internal-ip:51820 }
 UDP { external:989 -> server-internal-ip:51820 }
 UDP { external:80 -> server-internal-ip:51820 }
 ```
-10. Securely distribute each user's configuration and QR code image.
+11. Securely distribute each user's configuration and QR code image.
 
