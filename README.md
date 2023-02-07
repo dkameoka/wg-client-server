@@ -27,7 +27,7 @@
 ```
 ./wgclientserver.py client >> myclients.csv
 ```
-4. Edit myserver.csv. The CSV columns are the configuration name, IPv6 network (this is randomized, but can be manually chosen), Endpoint with external port, internal port, private key. The configuration names for both server and client may only contain alpha-numerics and "_=+.-" characters, and must be less than or equal to 15 characters. The IPv6 networks must be Unique Local Addresses (ULA), which start with "fd". It is also best to keep the /48 and /64 used in the next section.
+4. Edit myserver.csv. The CSV columns are the configuration name, IPv6 network (this is randomized, but can be manually chosen), Endpoint with external port, internal port, and private key. The configuration names for both server and client may only contain alpha-numerics and "_=+.-" characters, and must be less than or equal to 15 characters. The IPv6 networks must be Unique Local Addresses (ULA), which start with "fd". It is also best to keep the /48 and /64 used in the next section.
 ```
 wg-name,fd4e:d574:39d0::/48,<domain:443>,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
 ```
@@ -35,7 +35,7 @@ Example
 ```
 homeserver,fd4e:d574:39d0::/48,homeserver.duckdns.org:989,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
 ```
-5. Edit myclients.csv. The CSV columns are the configuration name, IPv6 address within the homeserver network (you can separate into different subnets to use with firewalls), persistent keep-alive sent per x seconds (keeps connections from being lost from firewalls/NATs), private key, pre-shared key (more encryption security).
+5. Edit myclients.csv. The CSV columns are the configuration name, IPv6 address within the homeserver network (you can separate into different subnets to use with firewalls), persistent keep-alive sent per x seconds (keeps connections from being lost from firewalls/NATs), private key, and pre-shared key (more encryption security).
 ```
 client-name,fd::/64,25,AKmMeRA72jiwWPGsDXfDTNISc79KDcdkVHLBlGJDxmc=,H6eTpAPpnkKMXw9yVf6EOYfIi47VbrbrFb2aqu7vtas=
 client-name,fd::/64,25,yPZ4LI/kRd2D3enlZKSoc75lc4kYFxgXlQX0HzA2tnA=,S1NCKs9i+Ycfg/Q9kk788kPueuM+pD6sB7wnp+ioas4=
@@ -53,11 +53,11 @@ friend-laptop,fd4e:d574:39d0:2::1/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MM
 ```
 ./wgclientserver.py build . myserver.csv myclients.csv
 ```
-7. Put the generated homeserver.conf on the server in /etc/wireguard/ or equivalent configuration path. Linux command below.
+7. Put the generated homeserver.conf on the server in /etc/wireguard/ or equivalent configuration path. The Linux command below copies homeserver.conf into /etc/wireguard/.
 ```
-sudo mv homeserver.conf /etc/wireguard/
+sudo cp homeserver.conf /etc/wireguard/
 ```
-8. Enable and activate the wireguard server. Linux Systemd command below.
+8. Enable and activate the wireguard server. The Linux command below enables and starts a Systemd unit instance of wg-quick with the name "homeserver".
 ```
 sudo systemctl enable --now wg-quick@homeserver
 ```
