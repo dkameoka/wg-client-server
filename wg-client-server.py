@@ -53,8 +53,9 @@ class ValueExc(Exception):
 class WireguardClientServer:
     """ Generates client server configurations """
 
-    def __init__(self, wireguard_path, server_path, client_path):
+    def __init__(self, wireguard_path, qrencode_path, server_path, client_path):
         self.wireguard_path = wireguard_path
+        self.qrencode_path = qrencode_path
         self.servers = []
         self.clients = []
         self.server_csv(server_path)
@@ -265,8 +266,9 @@ class WireguardClientServer:
                 output += f'PersistentKeepalive = {client.persistentkeepalive}\n'
                 outpath = outdir / (client.name + '.conf')
                 if self._write_if_different(outpath, output):
-                    if shutil.which('qrencode'):
-                        run(['qrencode', '-r', outpath, '-o', str(outpath) + '.png'], check=True)
+                    if self.qrencode_path:
+                        run([self.qrencode_path, '-r', outpath, '-o', str(outpath) + '.png'],
+                            check=True)
                 break
 
 
@@ -334,6 +336,12 @@ def _main():
         type=_file_type,
         help='Path to client CSV configuration file')
     build.add_argument(
+        '-q', '--qrencode',
+        dest='qrencode_path',
+        type=_file_type,
+        default=shutil.which('qrencode'),
+        help='Path to Qrencode executable')
+    build.add_argument(
         '-d', '--dry-run',
         dest='dry_run',
         action='store_true',
@@ -352,7 +360,7 @@ def _main():
 
     if args.command == 'build':
         wgcs = WireguardClientServer(
-            args.wireguard_path, args.server_csv, args.client_csv)
+            args.wireguard_path, args.qrencode_path, args.server_csv, args.client_csv)
         if not args.dry_run:
             wgcs.server_output(args.outdir)
             wgcs.client_output(args.outdir)
