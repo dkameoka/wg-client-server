@@ -19,15 +19,15 @@
 ## Setup
 ### Generating Configurations
 1. Change current working directory (CWD) into the one containing the wgclientserver.py script.
-2. Run the following command to generate a single server CSV line:
+2. Run the following command to generate a single server CSV line. It redirects and overwrites myserver.csv:
 ```
 ./wgclientserver.py server > myserver.csv
 ```
-3. Run the following command a bunch of times to generate multiple client CSV lines:
+3. Run the following command a bunch of times to generate multiple client CSV lines. It redirects and appends to myclients.csv:
 ```
 ./wgclientserver.py client >> myclients.csv
 ```
-4. Edit myserver.csv. The column are the configuration name, IPv6 network (this is randomized, but can be manually chosen), Endpoint with external port, internal port, private key. The configuration names for both server and client may only contain alpha-numerics and "_=+.-" characters, and must be less than or equal to 15 characters. The IPv6 networks must be Unique Local Addresses (ULA), which start with "fd". It is also best to keep the /48 and /64 used in the next section.
+4. Edit myserver.csv. The CSV columns are the configuration name, IPv6 network (this is randomized, but can be manually chosen), Endpoint with external port, internal port, private key. The configuration names for both server and client may only contain alpha-numerics and "_=+.-" characters, and must be less than or equal to 15 characters. The IPv6 networks must be Unique Local Addresses (ULA), which start with "fd". It is also best to keep the /48 and /64 used in the next section.
 ```
 wg-name,fd4e:d574:39d0::/48,<domain:443>,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
 ```
@@ -35,7 +35,7 @@ Example
 ```
 homeserver,fd4e:d574:39d0::/48,homeserver.duckdns.org:989,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
 ```
-5. Edit myclients.csv. The columns are the configuration name, IPv6 address within the homeserver network (you can separate into different subnets for firewalling), persistent keep-alive sent per x seconds (keeps connections from being lost from firewalls/NATs), private key, preshared key (more encryption security).
+5. Edit myclients.csv. The CSV columns are the configuration name, IPv6 address within the homeserver network (you can separate into different subnets for firewalling), persistent keep-alive sent per x seconds (keeps connections from being lost from firewalls/NATs), private key, preshared key (more encryption security).
 ```
 client-name,fd::/64,25,AKmMeRA72jiwWPGsDXfDTNISc79KDcdkVHLBlGJDxmc=,H6eTpAPpnkKMXw9yVf6EOYfIi47VbrbrFb2aqu7vtas=
 client-name,fd::/64,25,yPZ4LI/kRd2D3enlZKSoc75lc4kYFxgXlQX0HzA2tnA=,S1NCKs9i+Ycfg/Q9kk788kPueuM+pD6sB7wnp+ioas4=
@@ -57,7 +57,7 @@ friend-laptop,fd4e:d574:39d0:2::1/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MM
 ```
 systemctl enable --now wg-quick@homeserver
 ```
-If updating the server, run the following.
+If updating the server's configuration, run the following to update Wireguard's state without interruption.
 ```
 wg syncconf homeserver /etc/wireguard/homeserver.conf
 ```
