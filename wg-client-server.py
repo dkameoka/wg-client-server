@@ -213,6 +213,13 @@ class WireguardClientServer:
             raise ValueExc(f'Persistentkeepalive "{keepalive}" must be ' +
                            'between 1 and 7200 inclusive')
 
+    @staticmethod
+    def _write_if_different(outfile, contents):
+        if outfile.exists() and outfile.read_text(encoding='UTF-8', errors='ignore') == contents:
+            return False
+        outfile.write_text(contents, encoding='UTF-8', errors='ignore', newline='\n')
+        return True
+
     def server_output(self, outdir):
         for server in self.servers:
             output = '[Interface]\n'
@@ -237,8 +244,7 @@ class WireguardClientServer:
                 output += f'PublicKey = {client.publickey}\n'
                 output += f'PresharedKey = {client.presharedkey}\n'
                 output += f'AllowedIPs = {client.ipa}/{client.net.max_prefixlen}\n'
-            with (outdir / (server.name + '.conf')).open('w') as file:
-                file.write(output)
+            self._write_if_different(outdir / (server.name + '.conf'), output)
 
     def client_output(self, outdir):
         for client in self.clients:
@@ -258,10 +264,9 @@ class WireguardClientServer:
                 output += f'PresharedKey = {client.presharedkey}\n'
                 output += f'PersistentKeepalive = {client.persistentkeepalive}\n'
                 outpath = outdir / (client.name + '.conf')
-                with outpath.open('w') as file:
-                    file.write(output)
-                if shutil.which('qrencode'):
-                    run(['qrencode', '-r', outpath, '-o', str(outpath) + '.png'], check=True)
+                if self._write_if_different(outpath, output):
+                    if shutil.which('qrencode'):
+                        run(['qrencode', '-r', outpath, '-o', str(outpath) + '.png'], check=True)
                 break
 
 
