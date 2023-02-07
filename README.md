@@ -49,7 +49,7 @@ fam-tablet,fd4e:d574:39d0:1::/64/64,25,yPZ4LI/kRd2D3enlZKSoc75lc4kYFxgXlQX0HzA2t
 friend-phone,fd4e:d574:39d0:2::/64,25,2FCeazhMiZL1GO+IHMVzDgVvsv/rJFZcq0XDZwtAnk8=,GHM1EtQMCYvFzkSPdlnGRz8IvpkUS0fyYkkvqEbwcJI=
 friend-laptop,fd4e:d574:39d0:2::1/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MMSns=,NyyNX2yrhItvz6y1b0X7hHavlHVMCfqz28QBWgpf44E=
 ```
-6. Generate the configurations with the following command. Make sure to include the "." to specify CWD. If qrencode is installed, it will also generate the QR image files.
+6. Generate the configurations with the following command. Make sure to include the "." to specify CWD as the output path. If qrencode is installed, it will also generate the QR image files. Configuration files won't be written to if they haven't changed.
 ```
 ./wgclientserver.py build . myserver.csv myclients.csv
 ```
