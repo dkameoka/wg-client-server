@@ -19,11 +19,11 @@
 ## Setup
 ### Generating Configurations
 1. Change current working directory (CWD) into the one containing the wgclientserver.py script.
-2. Run the following command to generate a single server CSV line. It redirects and overwrites myserver.csv.
+2. Run the following command to generate a single server CSV line. It redirects and appends the output to myserver.csv.
 ```
-./wgclientserver.py server > myserver.csv
+./wgclientserver.py server >> myserver.csv
 ```
-3. Run the following command a bunch of times to generate multiple client CSV lines. It redirects and appends to myclients.csv.
+3. Run the following command a bunch of times to generate multiple client CSV lines. It redirects and appends the output to myclients.csv.
 ```
 ./wgclientserver.py client >> myclients.csv
 ```
