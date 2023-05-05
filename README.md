@@ -8,7 +8,7 @@
 ## Restrictions
 * Most cellular service providers and firewalls filter out various ports and traffic (UDP) that Wireguard uses. To get around this, use commonly used ports like 443, 989, and 80 for the server (port forwarding router or OS level pre-routing redirects) and Endpoints. When port forwarding on the server's router, you can forward all of those ports to 51820 towards the server. If that doesn't work to bypass, you may need to tunnel the Wireguard traffic and it may not be worth the hassle.
 * Without support for NAT hairpinning, a router won't forward packets with the external destination IP back to the internal network. To get around this, each client device would need a duplicate configuration with one Endpoint set to the internal host and the other for the external host. The client would need to toggle between those configurations as the device transitioned between the internal and external networks like between the home router and coffee shop router.
-* An external DNS has to be used for internal IPs for privacy reasons. Using the DNS setting in Wireguard could route all client DNS requests through the server. Duckdns.org is a great solution for this by using it for internal IPs.
+* DNS for internal IPv6s does not work over IPv4 sourced requests due to DNS filtering. Using the DNS setting in Wireguard could route all client DNS requests through the server; this is not recommended. Duckdns.org is a great solution for Endpoint IPs shown later on.
 
 ## Requires
 * All devices support IPv6. IPv6 internet is not required.
