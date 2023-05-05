@@ -1,9 +1,10 @@
-# Wireguard IPv6 Client Server Configurator Python Script
+# Wireguard IPv6 Client Server Command-line Tool
 
-* Used to set up a partially routed tunnel between server and clients.
-* Uses IPv6 for configurations. This reduces network collisions when using multiple VPNs. Tunnel endpoint can be through IPv4, so IPv6 connection is not necessary.
-* Great for home servers where family and friends can connect to.
-* Low dependencies: Only depends on the base Python 3 install, Wireguard (comes with newer Linux), and optional qrencode.
+## Features
+* Used to set up a tunnel between server and clients, and does not route all network traffic through it.
+* Uses IPv6 to reduce network collisions when using multiple VPNs. An IPv6 connection is not necessary, because IPv4 Endpoints can be used.
+* Low dependencies: Only depends on the base Python 3 install, Wireguard (comes with newer Linux/Android), and optional qrencode.
+* Very simple installation with only one Python script file.
 
 ## Restrictions
 * Most cellular service providers and firewalls filter out various ports and traffic (UDP) that Wireguard uses. To get around this, use commonly used ports like 443, 989, and 80 for the server (port forwarding router or OS level pre-routing redirects) and Endpoints. When port forwarding on the server's router, you can forward all of those ports to 51820 towards the server. If that doesn't work to bypass, you may need to tunnel the Wireguard traffic and it may not be worth the hassle.
@@ -15,6 +16,11 @@
 * Python 3.
 * wg command.
 * (Optional) qrencode command for QR encoded configurations.
+
+## Installation
+1. Install Python 3+.
+2. Download the wg-client-server.py.
+3. Use a terminal with Bash to change to the script's directory.
 
 ## Setup
 ### Generating Configurations
