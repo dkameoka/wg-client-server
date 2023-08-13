@@ -309,14 +309,14 @@ def gen_ula():
 def _output_folder_type(value):
     folder = Path(value)
     if not folder.is_dir():
-        raise ValueError(f'Path "{folder}" is not a folder')
+        raise argparse.ArgumentTypeError(f'Path "{folder}" is not a folder')
     return folder
 
 
 def _file_type(value):
     config = Path(value)
     if not config.exists() or not config.is_file():
-        raise ValueError(
+        raise argparse.ArgumentTypeError(
             'Configuration file must exist and must be a regular file.\n')
     return config
 
