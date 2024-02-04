@@ -85,10 +85,9 @@
     socat TCP6-LISTEN:9000,reuseaddr,fork TCP4:localhost:9001
     socat UDP6-LISTEN:9000,fork TCP4:localhost:9001
     ```
-
-   Example client(s) commands: Forwards TCP and UDP IPv4 traffic on port 8999 through the IPv6 tunnel to the server port 9000.
-   ```
-   socat TCP4-LISTEN:8999,reuseaddr,fork TCP6:[fd4e:d574:39d0::]:9000
-   socat UDP4-LISTEN:8999,fork TCP6:[fd4e:d574:39d0::]:9000
-   ```
+    Example client(s) commands: Forwards TCP and UDP IPv4 traffic on port 8999 through the IPv6 tunnel to the server port 9000.
+    ```
+    socat TCP4-LISTEN:8999,reuseaddr,fork TCP6:[fd4e:d574:39d0::]:9000
+    socat UDP4-LISTEN:8999,fork TCP6:[fd4e:d574:39d0::]:9000
+    ```
 
