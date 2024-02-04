@@ -26,57 +26,57 @@
 ### Generating Configurations
 1. Change current working directory (CWD) into the one containing the wgclientserver.py script.
 2. Run the following command to generate a single server CSV line. It redirects and appends the output to myserver.csv.
-```
-./wgclientserver.py server >> myserver.csv
-```
+   ```
+   ./wgclientserver.py server >> myserver.csv
+   ```
 3. Run the following command a bunch of times to generate multiple client CSV lines. It redirects and appends the output to myclients.csv.
-```
-./wgclientserver.py client >> myclients.csv
-```
+   ```
+   ./wgclientserver.py client >> myclients.csv
+   ```
 4. Edit myserver.csv. The CSV columns are the configuration name, IPv6 network (this is randomized, but can be manually chosen), Endpoint with external port, internal port, and private key. The configuration names for both server and client may only contain alpha-numerics and "_=+.-" characters, and must be less than or equal to 15 characters. The IPv6 networks must be Unique Local Addresses (ULA), which start with "fd". It is also best to keep the /48 and /64 used in the next section.
-```
-wg-name,fd4e:d574:39d0::/48,<domain:443>,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
-```
-Example
-```
-homeserver,fd4e:d574:39d0::/48,homeserver.duckdns.org:989,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
-```
+   ```
+   wg-name,fd4e:d574:39d0::/48,<domain:443>,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
+   ```
+   Example:
+   ```
+   homeserver,fd4e:d574:39d0::/48,homeserver.duckdns.org:989,51820,OOTIgHhgBQrYTP/5aeV6LLabsMoPciSKarz7E4wNjkE=
+   ```
 5. Edit myclients.csv. The CSV columns are the configuration name, IPv6 address within the homeserver network (you can separate into different subnets to use with firewalls), persistent keep-alive sent per x seconds (keeps connections from being lost from firewalls/NATs), private key, and pre-shared key (more encryption security).
-```
-client-name,fd::/64,25,AKmMeRA72jiwWPGsDXfDTNISc79KDcdkVHLBlGJDxmc=,H6eTpAPpnkKMXw9yVf6EOYfIi47VbrbrFb2aqu7vtas=
-client-name,fd::/64,25,yPZ4LI/kRd2D3enlZKSoc75lc4kYFxgXlQX0HzA2tnA=,S1NCKs9i+Ycfg/Q9kk788kPueuM+pD6sB7wnp+ioas4=
-client-name,fd::/64,25,2FCeazhMiZL1GO+IHMVzDgVvsv/rJFZcq0XDZwtAnk8=,GHM1EtQMCYvFzkSPdlnGRz8IvpkUS0fyYkkvqEbwcJI=
-client-name,fd::/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MMSns=,NyyNX2yrhItvz6y1b0X7hHavlHVMCfqz28QBWgpf44E=
-```
-Example
-```
-lead-desktop,fd4e:d574:39d0::1/64,25,AKmMeRA72jiwWPGsDXfDTNISc79KDcdkVHLBlGJDxmc=,H6eTpAPpnkKMXw9yVf6EOYfIi47VbrbrFb2aqu7vtas=
-fam-tablet,fd4e:d574:39d0:1::/64/64,25,yPZ4LI/kRd2D3enlZKSoc75lc4kYFxgXlQX0HzA2tnA=,S1NCKs9i+Ycfg/Q9kk788kPueuM+pD6sB7wnp+ioas4=
-friend-phone,fd4e:d574:39d0:2::/64,25,2FCeazhMiZL1GO+IHMVzDgVvsv/rJFZcq0XDZwtAnk8=,GHM1EtQMCYvFzkSPdlnGRz8IvpkUS0fyYkkvqEbwcJI=
-friend-laptop,fd4e:d574:39d0:2::1/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MMSns=,NyyNX2yrhItvz6y1b0X7hHavlHVMCfqz28QBWgpf44E=
-```
+   ```
+   client-name,fd::/64,25,AKmMeRA72jiwWPGsDXfDTNISc79KDcdkVHLBlGJDxmc=,H6eTpAPpnkKMXw9yVf6EOYfIi47VbrbrFb2aqu7vtas=
+   client-name,fd::/64,25,yPZ4LI/kRd2D3enlZKSoc75lc4kYFxgXlQX0HzA2tnA=,S1NCKs9i+Ycfg/Q9kk788kPueuM+pD6sB7wnp+ioas4=
+   client-name,fd::/64,25,2FCeazhMiZL1GO+IHMVzDgVvsv/rJFZcq0XDZwtAnk8=,GHM1EtQMCYvFzkSPdlnGRz8IvpkUS0fyYkkvqEbwcJI=
+   client-name,fd::/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MMSns=,NyyNX2yrhItvz6y1b0X7hHavlHVMCfqz28QBWgpf44E=
+   ```
+   Example:
+   ```
+   lead-desktop,fd4e:d574:39d0::1/64,25,AKmMeRA72jiwWPGsDXfDTNISc79KDcdkVHLBlGJDxmc=,H6eTpAPpnkKMXw9yVf6EOYfIi47VbrbrFb2aqu7vtas=
+   fam-tablet,fd4e:d574:39d0:1::/64/64,25,yPZ4LI/kRd2D3enlZKSoc75lc4kYFxgXlQX0HzA2tnA=,S1NCKs9i+Ycfg/Q9kk788kPueuM+pD6sB7wnp+ioas4=
+   friend-phone,fd4e:d574:39d0:2::/64,25,2FCeazhMiZL1GO+IHMVzDgVvsv/rJFZcq0XDZwtAnk8=,GHM1EtQMCYvFzkSPdlnGRz8IvpkUS0fyYkkvqEbwcJI=
+   friend-laptop,fd4e:d574:39d0:2::1/64,25,KFy3+Q2LTiQ/G5ciVvrArFFFdbpXt73JBXYFT9MMSns=,NyyNX2yrhItvz6y1b0X7hHavlHVMCfqz28QBWgpf44E=
+   ```
 6. Generate the configurations with the following command. Make sure to include the "." to specify CWD as the output path. If qrencode is installed, it will also generate the QR image files. Configuration files won't be written to if they haven't changed.
-```
-./wgclientserver.py build . myserver.csv myclients.csv
-```
+   ```
+   ./wgclientserver.py build . myserver.csv myclients.csv
+   ```
 7. Put the generated homeserver.conf on the server in /etc/wireguard/ or equivalent configuration path. The Linux command below copies homeserver.conf into /etc/wireguard/.
-```
-sudo cp homeserver.conf /etc/wireguard/
-```
+   ```
+   sudo cp homeserver.conf /etc/wireguard/
+   ```
 8. Enable and activate the wireguard server. The Linux command below enables and starts a Systemd unit instance of wg-quick with the name "homeserver".
-```
-sudo systemctl enable --now wg-quick@homeserver
-```
+   ```
+   sudo systemctl enable --now wg-quick@homeserver
+   ```
 If updating the server's configuration, modify and run the following to update Wireguard's state without interruption. The wg-quick command is used to remove wg-quick options while in a sub-shell and piping it to the wg command.
-```
-sudo wg syncconf homeserver <(wg-quick strip /etc/wireguard/homeserver.conf)
-```
+   ```
+   sudo wg syncconf homeserver <(wg-quick strip /etc/wireguard/homeserver.conf)
+   ```
 9. Allow Wireguard and the server services through the server's firewall. See my [nftables configuration scripts](https://github.com/dkameoka/nftables-template).
 10. Port forward the server's router to forward ports 443, 989, and 80 with UDP traffic towards the server's internal IP with 51820. Below is a diagram.
-```
-UDP { external:443 -> server-internal-ip:51820 }
-UDP { external:989 -> server-internal-ip:51820 }
-UDP { external:80 -> server-internal-ip:51820 }
-```
+   ```
+   UDP { external:443 -> server-internal-ip:51820 }
+   UDP { external:989 -> server-internal-ip:51820 }
+   UDP { external:80 -> server-internal-ip:51820 }
+   ```
 11. Securely distribute each user's configuration and QR code image.
 
