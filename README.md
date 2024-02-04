@@ -79,4 +79,16 @@ If updating the server's configuration, modify and run the following to update W
    UDP { external:80 -> server-internal-ip:51820 }
    ```
 11. Securely distribute each user's configuration and QR code image.
+12. (Optional) For IPv4 forwarding, the following example commands can be run as a background service to allow applications without IPv6 support to communicate over the tunnel:
+   Example server commands: Forwards TCP and UDP IPv6 traffic on port 9000 to a local IPv4 service on port 9001.
+   ```
+   socat TCP6-LISTEN:9000,reuseaddr,fork TCP4:localhost:9001
+   socat UDP6-LISTEN:9000,fork TCP4:localhost:9001
+   ```
+
+   Example client(s) commands: Forwards TCP and UDP IPv4 traffic on port 8999 through the IPv6 tunnel to the server port 9000.
+   ```
+   socat TCP4-LISTEN:8999,reuseaddr,fork TCP6:[fd4e:d574:39d0::]:9000
+   socat UDP4-LISTEN:8999,fork TCP6:[fd4e:d574:39d0::]:9000
+   ```
 
