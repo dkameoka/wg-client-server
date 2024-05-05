@@ -271,7 +271,7 @@ class WireguardClientServer:
                 output += f'PrivateKey = {client.privatekey}\n\n'
                 output += '[Peer]\n'
                 output += f'# Name = {server.name}\n'
-                output += f'AllowedIPs = {server.net}\n'
+                output += f'AllowedIPs = {server.ipa}/{server.net.max_prefixlen}\n'
                 output += f'Endpoint = {server.endpoint}\n'
                 output += f'PublicKey = {server.publickey}\n'
                 output += f'PresharedKey = {client.presharedkey}\n'
